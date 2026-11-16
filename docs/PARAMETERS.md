@@ -7,6 +7,7 @@
 - `/health` 版本为2026.11.16.2，`profile`支持personal/demo/public。
 - `public_share.py [--no-browser]`：独立公网账本目录data/public、端口8003、HOST=127.0.0.1、COOKIE_SECURE=1；SSH只转发该端口，不转发正式8000和演示8001。
 - `data/public/public-url.txt`记录当前通道地址；`tunnel.log`和`known_hosts`保存本机通道状态。公开链接依赖本机在线，地址可能轮换；此模式未提供常驻云服务SLA。
+- 保活器：`public_share.py --keep-alive`，每30秒进行一次真实HTTPS健康检查；连续运行时检测无效链接后重连，错误写入`data/public/monitor.log`。本机127.0.0.1:8004独占绑定防止重复保活器，此端口不对外提供服务。新地址只在HTTPS健康检查通过后保存；不保证第三方通道永久不变。
 
 本文是配置和业务参数的唯一集中说明。应用使用 HTML 表单与服务端模板，不暴露通用 JSON API。默认时区为北京时间 UTC+8，金额均为人民币。
 
