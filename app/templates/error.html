@@ -1,0 +1,1 @@
+{% extends 'base.html' %}{% block content %}<section class="panel form-panel error-panel"><div class="eyebrow">LET'S TRY AGAIN</div><h1>稍作调整，就好</h1><p>{{ message }}</p><div class="form-actions"><button class="button primary" type="button" data-back>返回上一页</button><a class="button secondary" href="{{ url_for('web.home') }}">回到首页</a></div></section>{% endblock %}

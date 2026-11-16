@@ -1,0 +1,15 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="theme-color" content="#13764a"><title>{% block title %}小荔枝 · 家庭记账{% endblock %}</title><link rel="icon" href="{{ url_for('static',filename='leaf.svg') }}" type="image/svg+xml"><link rel="stylesheet" href="{{ url_for('static',filename='app.css') }}"><script src="{{ url_for('static',filename='app.js') }}" defer></script></head>
+<body>
+{% from 'macros.html' import icon %}
+<div class="app-shell">
+<aside class="sidebar"><a class="brand" href="{{ url_for('web.home') }}">{{ icon('leaf') }}<span>小荔枝<small>家庭记账 · 让生活有数</small></span></a>
+{% if g.user %}<div class="sidebar-caption">我的生活账本</div><nav aria-label="主要导航">{% for key,label,name in [('home','首页','home'),('entries','账单','list'),('stats','统计','chart'),('budget','预算','wallet'),('settings','我的','user')] %}<a href="{{ url_for('web.' + ('budgets' if key=='budget' else key)) }}" class="nav-link {{ 'active' if active|default('')==key else '' }}">{{ icon(name) }}<span>{{ label }}</span></a>{% endfor %}</nav><div class="sidebar-footer"><span class="avatar">{{ g.user.name[0] }}</span><div>{{ g.user.name }}<small>每一笔，都是生活</small></div></div>{% endif %}</aside>
+<main class="main-content"><header class="topbar"><a class="mobile-brand" href="{{ url_for('web.home') }}">{{ icon('leaf') }}小荔枝</a><span class="top-note">好好记账，慢慢积累。</span>{% if g.user %}<a class="button primary" href="{{ url_for('web.entry') }}">{{ icon('plus') }}记一笔</a>{% else %}<span class="pill">欢迎来到小荔枝</span>{% endif %}</header>
+{% with messages=get_flashed_messages(with_categories=true) %}{% for category,message in messages %}<div class="notice {{ category }}" role="status">{{ message }}</div>{% endfor %}{% endwith %}
+{% block content %}{% endblock %}
+<footer class="page-footer">小荔枝 · 把日子过成喜欢的样子</footer></main>
+</div>
+{% if g.user %}<nav class="mobile-nav" aria-label="手机导航">{% for key,label,name in [('home','首页','home'),('entries','账单','list'),('stats','统计','chart'),('budget','预算','wallet'),('settings','我的','user')] %}<a href="{{ url_for('web.' + ('budgets' if key=='budget' else key)) }}" class="{{ 'active' if active|default('')==key else '' }}">{{ icon(name) }}<span>{{ label }}</span></a>{% endfor %}</nav>{% endif %}
+</body></html>
