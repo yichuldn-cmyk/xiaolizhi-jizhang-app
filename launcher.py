@@ -12,14 +12,14 @@ import webbrowser
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent
-VERSION = "2026.11.16.1"
+VERSION = "2026.11.16.2"
 
 
-def health(url):
+def health(url, timeout=1):
     """绕过系统代理检查本机就绪状态；失败仅返回None。"""
     opener = urllib.request.build_opener(urllib.request.ProxyHandler({}))
     try:
-        with opener.open(url + "/health", timeout=1) as response:
+        with opener.open(url + "/health", timeout=timeout) as response:
             return json.load(response)
     except (urllib.error.URLError, TimeoutError, json.JSONDecodeError, OSError):
         return None

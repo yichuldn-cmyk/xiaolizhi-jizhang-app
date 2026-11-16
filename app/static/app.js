@@ -1,5 +1,22 @@
 /* 交互只负责展示；统计、权限、金额和入账逻辑均在 Python 服务端。 */
 (() => {
+  const root = document.documentElement;
+  const layoutButtons = document.querySelectorAll('[data-layout-choice]');
+  const screen = window.matchMedia('(max-width: 760px)');
+  let automatic = root.dataset.layout === 'auto';
+  function setLayout(mode, remember = false) {
+    root.dataset.layout = mode;
+    layoutButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.layoutChoice === mode)));
+    document.querySelector('.layout-status').textContent = mode === 'mobile' ? '单列 · 触屏布局' : '多列 · 工作台布局';
+    if (remember) {
+      automatic = false;
+      document.cookie = `layout_mode=${mode}; Path=/; Max-Age=31536000; SameSite=Lax`;
+    }
+    // 图表使用容器尺寸；模式变化后重绘，避免沿用切换前的宽度。
+    requestAnimationFrame(drawTrends);
+  }
+  layoutButtons.forEach(button => button.addEventListener('click', () => setLayout(button.dataset.layoutChoice, true)));
+  screen.addEventListener('change', () => { if (automatic) setLayout(screen.matches ? 'mobile' : 'desktop'); });
   const colors = ['#17794a', '#5b9d60', '#98bd75', '#c7d99b', '#628f8a', '#a1b5a4'];
   document.querySelectorAll('.donut').forEach(chart => {
     const values = JSON.parse(chart.dataset.values).map(([, value]) => Math.max(0, value));
@@ -20,7 +37,7 @@
     if (text !== undefined) node.textContent = text;
     return node;
   };
-  document.querySelectorAll('.trend').forEach(container => {
+  function drawTrends() { document.querySelectorAll('.trend').forEach(container => {
     const days = JSON.parse(container.dataset.days);
     if (!days.length) return;
     const width = Math.max(240, container.clientWidth - 4), height = 220;
@@ -46,7 +63,12 @@
     });
     [1, 15, last].forEach(day => svg.append(svgNode('text', {x: x(`${month}-${String(day).padStart(2, '0')}`), y: 211, 'text-anchor': 'middle'}, `${day}日`)));
     container.replaceChildren(svg);
-  });
+  }); }
+  setLayout(automatic ? (screen.matches ? 'mobile' : 'desktop') : root.dataset.layout);
+  if (window.ResizeObserver) {
+    const trendObserver = new ResizeObserver(drawTrends);
+    document.querySelectorAll('.trend').forEach(container => trendObserver.observe(container));
+  }
 
   document.querySelectorAll('form[data-confirm]').forEach(form => {
     form.addEventListener('submit', event => { if (!confirm(form.dataset.confirm)) event.preventDefault(); });

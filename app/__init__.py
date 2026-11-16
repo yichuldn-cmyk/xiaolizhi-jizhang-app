@@ -33,8 +33,9 @@ def create_app(test_config=None):
     @app.get("/health")
     def health():
         """供本机启动器识别版本和账本模式；不返回用户或数据库路径。"""
-        return {"app": "lizhi-ledger", "version": "2026.11.16.1",
-                "profile": "demo" if Path(app.config["DATABASE"]).parent.name == "demo" else "personal"}
+        folder = Path(app.config["DATABASE"]).parent.name
+        return {"app": "lizhi-ledger", "version": "2026.11.16.2",
+                "profile": folder if folder in ("demo", "public") else "personal"}
 
     @app.before_request
     def load_identity():

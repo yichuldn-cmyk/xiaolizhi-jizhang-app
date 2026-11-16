@@ -15,3 +15,4 @@ backups/
 *.key
 .pytest_cache/
 .coverage
+work/

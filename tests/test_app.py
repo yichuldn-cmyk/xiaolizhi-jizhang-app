@@ -213,6 +213,18 @@ class LedgerTests(unittest.TestCase):
         self.assertEqual(response.status_code, 302)
 
 
+    def test_layout_preference_and_invalid_cookie(self):
+        self.client.set_cookie("layout_mode", "mobile")
+        for path in ("/", "/entries", "/stats", "/settings"):
+            body = self.client.get(path).get_data(as_text=True)
+            self.assertIn('data-layout="mobile"', body)
+            self.assertIn('aria-label="显示布局"', body)
+            self.assertIn('data-layout-choice="desktop"', body)
+        self.client.set_cookie("layout_mode", "desktop")
+        self.assertIn('data-layout="desktop"', self.client.get("/").get_data(as_text=True))
+        self.client.set_cookie("layout_mode", "invalid")
+        self.assertIn('data-layout="auto"', self.client.get("/").get_data(as_text=True))
+
     def test_backup_integrity_and_restore(self):
         from manage import backup
         self.seed(amount=1234)
